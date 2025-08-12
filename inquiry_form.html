@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お問い合わせフォーム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Hiragino Sans', 'ヒラギノ角ゴシック', 'Yu Gothic', 'メイリオ', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            margin-top: 50px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .required {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .submit-btn {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .submit-btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .note {
+            background-color: #e8f4fd;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>お問い合わせ</h1>
+        
+        <div class="note">
+            <strong>お問い合わせありがとうございます。</strong><br>
+            ご入力いただいた内容を確認後、担当者よりご連絡いたします。<br>
+            緊急のご用件の場合は、件名に「緊急」とご記入ください。
+        </div>
+        
+        <form id="inquiryForm">
+            <div class="form-group">
+                <label for="name">
+                    お名前
+                    <span class="required">*必須</span>
+                </label>
+                <input type="text" id="name" name="name" required placeholder="山田太郎">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">
+                    メールアドレス
+                    <span class="required">*必須</span>
+                </label>
+                <input type="email" id="email" name="email" required placeholder="example@email.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="subject">
+                    件名
+                    <span class="required">*必須</span>
+                </label>
+                <input type="text" id="subject" name="subject" required placeholder="お問い合わせの件名をご入力ください">
+            </div>
+            
+            <div class="form-group">
+                <label for="message">
+                    お問い合わせ内容
+                    <span class="required">*必須</span>
+                </label>
+                <textarea id="message" name="message" required placeholder="お問い合わせ内容を詳しくご記入ください"></textarea>
+            </div>
+            
+            <button type="submit" class="submit-btn" id="submitBtn">送信する</button>
+        </form>
+        
+        <div class="loading" id="loading">
+            送信中です...
+        </div>
+        
+        <div class="success-message" id="successMessage">
+            お問い合わせを受け付けました。自動返信メールをお送りしましたのでご確認ください。
+        </div>
+        
+        <div class="error-message" id="errorMessage">
+            申し訳ございません。エラーが発生しました。しばらく後に再度お試しください。
+        </div>
+    </div>
+
+    <script>
+        // 送信先（本番運用時は Production URL に差し替え）
+        const WEBHOOK_URL = 'https://manabito.app.n8n.cloud/webhook/inquiry'; // ←必要に応じて変更
+
+        async function postJSON(url, data, { timeoutMs = 15000 } = {}) {
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data),
+                    signal: ctrl.signal,
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return true; // 本文は使わない
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
+        document.getElementById('inquiryForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // フォームデータを取得
+            const formData = {
+                name: document.getElementById('name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                subject: document.getElementById('subject').value.trim(),
+                message: document.getElementById('message').value.trim()
+            };
+            
+            // バリデーション
+            if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+                showError('すべての必須項目を入力してください。');
+                return;
+            }
+            
+            // メールアドレスの簡単なバリデーション
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(formData.email)) {
+                showError('正しいメールアドレスを入力してください。');
+                return;
+            }
+            
+            try {
+                showLoading();
+                console.log('posting to', WEBHOOK_URL);
+                await postJSON(WEBHOOK_URL, formData, { timeoutMs: 15000 });
+                hideLoading();
+                showSuccess();
+                document.getElementById('inquiryForm').reset();
+            } catch (error) {
+                console.error(error);
+                hideLoading();
+                showError('送信に失敗しました。しばらく後に再度お試しください。');
+            }
+        });
+        
+        function showLoading() {
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+            hideMessages();
+        }
+        
+        function hideLoading() {
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('loading').style.display = 'none';
+        }
+        
+        function showSuccess() {
+            document.getElementById('successMessage').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('successMessage').style.display = 'none';
+            }, 5000);
+        }
+        
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 5000);
+        }
+        
+        function hideMessages() {
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+        
+        // 入力フィールドのリアルタイムバリデーション
+        document.getElementById('email').addEventListener('blur', function() {
+            const email = this.value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (email && !emailRegex.test(email)) {
+                this.style.borderColor = '#e74c3c';
+            } else {
+                this.style.borderColor = '#ddd';
+            }
+        });
+        
+        // 文字数カウンター（メッセージ欄）
+        document.getElementById('message').addEventListener('input', function() {
+            const maxLength = 1000;
+            const currentLength = this.value.length;
+            
+            if (currentLength > maxLength) {
+                this.value = this.value.substring(0, maxLength);
+            }
+        });
+    </script>
+</body>
+</html>
+
